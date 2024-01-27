@@ -97,9 +97,6 @@ export const updateSong = async (req, res, next) => {
       data: updatedSong,
     });
   } catch (error) {
-    // Check if the error is a validation error
-
-    // Handle other types of errors
     next(error);
   }
 };
@@ -107,7 +104,7 @@ export const updateSong = async (req, res, next) => {
 export const removeSong = async (req, res, next) => {
   const { id } = req.params;
   try {
-    const removedSong = await Song.findByIdAndRemove(id);
+    const removedSong = await Song.findByIdAndDelete(id);
     res.status(200).json({
       success: true,
       data: removedSong,
@@ -117,52 +114,6 @@ export const removeSong = async (req, res, next) => {
     next(error);
   }
 };
-// export const getTotalCounts = async (req, res, next) => {
-// try {
-//   console.log("Before Song.find()");
-//   const allSongs = await Song.find();
-//   console.log("After Song.find()", allSongs);
-
-//   // const uniqueArtists = [...new Set(allSongs.map((song) => song.artist))];
-//   // const uniqueAlbums = [...new Set(allSongs.map((song) => song.album))];
-//   // const uniqueGenres = [...new Set(allSongs.map((song) => song.genre))];
-
-//   // // Log unique values for debugging
-//   // console.log("Unique Artists:", uniqueArtists);
-//   // console.log("Unique Albums:", uniqueAlbums);
-//   // console.log("Unique Genres:", uniqueGenres);
-
-//   // const totalSongs = allSongs.length;
-//   // const totalArtists = uniqueArtists.length;
-//   // const totalAlbums = uniqueAlbums.length;
-//   // const totalGenres = uniqueGenres.length;
-
-//   res.json({
-//     // totalSongs,
-//     // totalArtists,
-//     // totalAlbums,
-//     // totalGenres,
-//     allSongs,
-//   });
-// } catch (error) {
-//   res.status(500).json({
-//     success: false,
-//     error: error,
-//   });
-// }
-//   try {
-//     const songs = await Song.find();
-//     res.status(200).json({
-//       success: true,
-//       data: songs,
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       success: false,
-//       error: "Internal Server Error",
-//     });
-//   }
-// };
 
 export const getGeneralStats = async (req, res) => {
   try {
