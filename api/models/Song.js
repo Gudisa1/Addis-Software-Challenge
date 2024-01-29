@@ -5,11 +5,11 @@ const songSchema = new mongoose.Schema(
     title: { type: String, required: true },
     artist: { type: String, required: true },
     album: { type: String, required: true },
-    genre: { type: String, required: true, index: true }, // Add an index on the genre field
+    genre: { type: String, required: true, index: true },
   },
-  { timestamps: true } // Add timestamps for createdAt and updatedAt fields
+  { timestamps: true }
 );
 
-const Song = mongoose.model("Song", songSchema, "songs"); // Explicitly set lowercase collection name
+const Song = mongoose.model("Song", songSchema, "songs");
 
 export default Song;

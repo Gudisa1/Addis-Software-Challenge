@@ -1,10 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, ChangeEvent, FormEvent } from "react";
 import styled from "@emotion/styled";
-import { Link } from "react-router-dom"; // Import Link for navigation
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addSong } from "../redux/features/song/songSlice";
-import { useNavigate } from "react-router-dom";
 import { createSong } from "../helpers/api";
+
+interface Song {
+  title: string;
+  artist: string;
+  album: string;
+  genre: string;
+}
+
 const CreateSongContainer = styled.div`
   max-width: 400px;
   margin: auto;
@@ -50,24 +57,32 @@ const GoBackHomeButton = styled(Link)`
   text-decoration: none;
 `;
 
-const CreateSong = () => {
-  const [song, setSong] = useState({
+const ErrorMessage = styled.p`
+  color: #ff5c5c;
+  margin-top: 8px;
+`;
+
+const CreateSong: React.FC = () => {
+  const [song, setSong] = useState<Song>({
     title: "",
     artist: "",
     album: "",
     genre: "",
   });
+
+  const [error, setError] = useState<string | null>(null);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSong({
       ...song,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const createdSong = await createSong(song);
@@ -77,10 +92,11 @@ const CreateSong = () => {
         album: "",
         genre: "",
       });
+      setError(null);
       navigate("/");
     } catch (error) {
       console.error("Error creating song:", error);
-      
+      setError("Error creating song. Please try again.");
     }
   };
 
@@ -120,9 +136,9 @@ const CreateSong = () => {
         />
 
         <SubmitButton type="submit">Create Song</SubmitButton>
-        <Link to="/">
-          <p>Go Back Home</p>
-        </Link>
+        <GoBackHomeButton to="/">Go Back Home</GoBackHomeButton>
+
+        {error && <ErrorMessage>{error}</ErrorMessage>}
       </form>
     </CreateSongContainer>
   );

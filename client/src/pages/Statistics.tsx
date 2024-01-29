@@ -50,6 +50,30 @@ const StatLabel = styled.div`
   font-size: 1rem;
   color: #666;
 `;
+interface GenreCount {
+  [genre: string]: number;
+}
+
+interface ArtistStats {
+  [artist: string]: {
+    songCount: number;
+    albumCount: Record<string, number>;
+  };
+}
+
+interface SongsInAlbums {
+  [album: string]: string[];
+}
+
+interface StatisticsProps {
+  totalSongs: number;
+  totalArtists: number;
+  totalAlbums: number;
+  totalGenres: number;
+  genreCounts: GenreCount;
+  artistStats: ArtistStats;
+  songsInAlbums: SongsInAlbums;
+}
 
 const Statistics = () => {
   const dispatch = useDispatch();
@@ -73,36 +97,6 @@ const Statistics = () => {
     // You might want to render a loading indicator here while statistics are being fetched
     return <div>Loading...</div>;
   }
-  const data = {
-    totalSongs: 5,
-    totalArtists: 3,
-    totalAlbums: 4,
-    totalGenres: 2,
-    genreCounts: {
-      Anchihoye: 4,
-      Bati: 1,
-    },
-    artistStats: {
-      "Tewdrose Tadesse": {
-        songCount: 1,
-        albumCount: {},
-      },
-      "Haileyesus Tesfaye": {
-        songCount: 1,
-        albumCount: {},
-      },
-      "Abel Tesfaye": {
-        songCount: 3,
-        albumCount: {},
-      },
-    },
-    songsInAlbums: {
-      Zimta: ["Zimta"],
-      "Ke Komshebet Bota": ["Ke Komshebet Bota"],
-      "Daft Punk": ["False Alarm", "Blinding Lights"],
-      "After Hours": ["Save your Tears"],
-    },
-  };
 
   return (
     <Container>

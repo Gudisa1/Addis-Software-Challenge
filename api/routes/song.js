@@ -4,7 +4,6 @@ import {
   listSongs,
   updateSong,
   removeSong,
-  // getTotalCounts,
   getSingleSong,
   getGeneralStats,
 } from "../controllers/song.js";

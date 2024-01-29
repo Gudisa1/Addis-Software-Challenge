@@ -1,10 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, ChangeEvent, FormEvent } from "react";
 import styled from "@emotion/styled";
-import { Link } from "react-router-dom";
-import { useParams, useNavigate } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { updateSongById } from "../helpers/api";
 import { updateSong } from "../redux/features/song/songSlice";
+
+interface Song {
+  title: string;
+  artist: string;
+  album: string;
+  genre: string;
+}
+
 const EditSongContainer = styled.div`
   max-width: 400px;
   margin: auto;
@@ -50,24 +57,32 @@ const GoToHomeButton = styled(Link)`
   text-decoration: none;
 `;
 
-const EditSong = () => {
-  const { id } = useParams();
+const ErrorMessage = styled.p`
+  color: #ff5c5c;
+  margin-top: 8px;
+`;
+
+const EditSong: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [song, setSong] = useState({
+  const [song, setSong] = useState<Song>({
     title: "",
     artist: "",
     album: "",
     genre: "",
   });
 
-  const handleInputChange = (e) => {
+  const [error, setError] = useState<string | null>(null);
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSong({
       ...song,
       [e.target.name]: e.target.value,
     });
   };
-  const handleSubmit = async (e) => {
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
@@ -78,9 +93,11 @@ const EditSong = () => {
       navigate("/");
       window.location.reload();
     } catch (error) {
-      console.log("Error updating song:", error);
+      console.error("Error updating song:", error);
+      setError("Error updating song. Please try again.");
     }
   };
+
   return (
     <EditSongContainer>
       <form onSubmit={handleSubmit}>
@@ -118,6 +135,8 @@ const EditSong = () => {
 
         <SubmitButton type="submit">Save Changes</SubmitButton>
         <GoToHomeButton to="/">Go to Home</GoToHomeButton>
+
+        {error && <ErrorMessage>{error}</ErrorMessage>}
       </form>
     </EditSongContainer>
   );

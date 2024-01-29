@@ -66,28 +66,23 @@ export const listSongs = async (req, res) => {
   }
 };
 
-// Controller to update a song by ID
 export const updateSong = async (req, res, next) => {
   const { id } = req.params;
 
   try {
-    // Validate if the provided ID is a valid MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ error: "Invalid song ID" });
     }
 
-    // Check if the request body is empty
     if (Object.keys(req.body).length === 0) {
       return res.status(400).json({ error: "Request body is empty" });
     }
 
-    // Update the song and return the updated document
     const updatedSong = await Song.findByIdAndUpdate(id, req.body, {
       new: true,
-      runValidators: true, // Validate the updated data against the schema
+      runValidators: true,
     });
 
-    // Check if the song with the given ID exists
     if (!updatedSong) {
       return res.status(404).json({ error: "Song not found" });
     }
@@ -128,13 +123,11 @@ export const getGeneralStats = async (req, res) => {
     const totalAlbums = uniqueAlbums.length;
     const totalGenres = uniqueGenres.length;
 
-    // Count of songs in each genre
     const genreCounts = {};
     allSongs.forEach((song) => {
       genreCounts[song.genre] = (genreCounts[song.genre] || 0) + 1;
     });
 
-    // Number of songs and albums each artist has
     const artistStats = {};
     allSongs.forEach((song) => {
       artistStats[song.artist] = artistStats[song.artist] || {
@@ -145,7 +138,6 @@ export const getGeneralStats = async (req, res) => {
       artistStats[song.artist].albumCount.add(song.album);
     });
 
-    // Songs in each album
     const songsInAlbums = {};
     allSongs.forEach((song) => {
       songsInAlbums[song.album] = songsInAlbums[song.album] || [];
