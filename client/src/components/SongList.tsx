@@ -9,6 +9,15 @@ import {
 } from "../redux/features/song/songSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchData, deleteSongById } from "../helpers/api";
+
+interface Song {
+  _id: string;
+  title: string;
+  artist: string;
+  album: string;
+  genre: string;
+}
+
 const Container = styled.div`
   max-width: 800px;
   margin: 20px auto;
@@ -74,9 +83,9 @@ const UpdateButton = styled(FiEdit)`
   cursor: pointer;
 `;
 
-const SongList = () => {
+const SongList: React.FC = () => {
   const dispatch = useDispatch();
-  const songs = useSelector(selectSongs);
+  const songs: Song[] = useSelector(selectSongs);
 
   useEffect(() => {
     const fetchSongs = async () => {
@@ -91,7 +100,7 @@ const SongList = () => {
     fetchSongs();
   }, [dispatch]);
 
-  const handleDelete = async (songId) => {
+  const handleDelete = async (songId: string) => {
     try {
       const response = await deleteSongById(songId);
       console.log("Song deleted successfully:", response);

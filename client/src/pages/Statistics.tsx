@@ -94,7 +94,6 @@ const Statistics = () => {
     fetchData();
   }, [dispatch]);
   if (!statistics) {
-    // You might want to render a loading indicator here while statistics are being fetched
     return <div>Loading...</div>;
   }
 
