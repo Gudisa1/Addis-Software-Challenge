@@ -177,11 +177,15 @@ export const getGeneralStats = async (req, res, next) => {
   }
 };
 export const searchSongs = async (req, res, next) => {
-  const { query } = req.params;
-
   try {
+    const { query } = req.params;
+
     if (!query) {
-      return next(errorHandler(res, 400, "Please provide a search query"));
+      const allSongs = await Song.find();
+      return res.status(200).json({
+        success: true,
+        data: allSongs,
+      });
     }
 
     const searchResults = await Song.find({
@@ -232,6 +236,24 @@ export const filterSongsByGenre = async (req, res, next) => {
     });
   } catch (error) {
     console.error("Error in filterSongsByGenre:", error);
+    next(error);
+  }
+};
+
+export const getUniqueGenres = async (req, res, next) => {
+  try {
+    const uniqueGenres = await Song.distinct("genre");
+
+    if (!uniqueGenres || uniqueGenres.length === 0) {
+      return next(errorHandler(res, 404, "No unique genres found"));
+    }
+
+    res.status(200).json({
+      success: true,
+      data: uniqueGenres,
+    });
+  } catch (error) {
+    console.error("Error in getUniqueGenres:", error);
     next(error);
   }
 };

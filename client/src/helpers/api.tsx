@@ -62,6 +62,17 @@ export const updateSongById = async (
     throw error;
   }
 };
+export const getSongById = async (songId: string): Promise<void> => {
+  try {
+    const response: AxiosResponse<void> = await axios.get(
+      `${API_ENDPOINT}songs/${songId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating song:", error);
+    throw error;
+  }
+};
 
 export const createSong = async (
   songData: Omit<Song, "_id">
@@ -86,6 +97,26 @@ export const fetchStatistics = async (): Promise<Statistics> => {
     return response.data;
   } catch (error) {
     console.error("Error fetching statistics:", error);
+    throw error;
+  }
+};
+
+export const searchSongs = async (query: string): Promise<any> => {
+  try {
+    const response = await axios.get(`${API_ENDPOINT}songs/search/${query}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error searching songs:", error);
+    throw error;
+  }
+};
+
+export const fetchGenres = async () => {
+  try {
+    const response = await axios.get("http://localhost:5000/api/songs/genres");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching genres:", error);
     throw error;
   }
 };

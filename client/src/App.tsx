@@ -3,8 +3,8 @@ import Navbar from "./components/Navbar";
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Statistics from "./pages/Statistics";
-import EditSong from "./pages/EditSong";
-import CreateSong from "./pages/CreateSong";
+import EditSong from "./pages/editsong/EditSong";
+import CreateSong from "./pages/createsong/CreateSong";
 
 function App() {
   return (
