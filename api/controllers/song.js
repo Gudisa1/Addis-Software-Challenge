@@ -5,23 +5,29 @@ export const createSong = async (req, res, next) => {
   try {
     const { title, artist, album, genre } = req.body;
     if (!title || !artist || !album || !genre) {
-      return res.status(400).json({
-        success: false,
-        error:
-          "Please provide values for 'title', 'artist', 'album', and 'genre'.",
-      });
+      return next(
+        errorHandler(
+          res,
+          400,
+          "Please provide values for title, artist, album, and genre."
+        )
+      );
     }
     const existingSong = await Song.findOne({ title, artist });
-    if (existingSong) {
-      return res.status(400).json({
-        success: false,
-        error: "A song with the same title and artist already exists.",
-      });
+    if (
+      existingSong &&
+      existingSong.title === title &&
+      existingSong.artist === artist
+    ) {
+      return next(
+        errorHandler(
+          res,
+          400,
+          "A song with the same title and artist already exists."
+        )
+      );
     }
-
-    // Create a new song
     const newSong = await Song.create(req.body);
-
     res.status(201).json({
       success: true,
       data: newSong,
@@ -32,26 +38,27 @@ export const createSong = async (req, res, next) => {
   }
 };
 
-export const getSingleSong = async (req, res) => {
+export const getSingleSong = async (req, res, next) => {
   const { id } = req.params;
 
   try {
-    const song = await Song.findById(id);
-
-    if (!song) {
-      return res.status(404).json({ error: "Song not found" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return next(errorHandler(res, 400, "Invalid song ID"));
     }
-
+    const song = await Song.findById(id);
+    if (!song) {
+      return next(errorHandler(res, 404, "Song not found"));
+    }
     res.status(200).json({
       success: true,
       data: song,
     });
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    next(error);
   }
 };
 
-export const listSongs = async (req, res) => {
+export const listSongs = async (req, res, next) => {
   try {
     const songs = await Song.find();
     res.status(200).json({
@@ -59,10 +66,7 @@ export const listSongs = async (req, res) => {
       data: songs,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: "Internal Server Error",
-    });
+    next(error);
   }
 };
 
@@ -71,11 +75,11 @@ export const updateSong = async (req, res, next) => {
 
   try {
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ error: "Invalid song ID" });
+      return next(errorHandler(res, 400, "Invalid song ID"));
     }
 
     if (Object.keys(req.body).length === 0) {
-      return res.status(400).json({ error: "Request body is empty" });
+      return next(errorHandler(res, 400, "Request body is empty"));
     }
 
     const updatedSong = await Song.findByIdAndUpdate(id, req.body, {
@@ -84,7 +88,7 @@ export const updateSong = async (req, res, next) => {
     });
 
     if (!updatedSong) {
-      return res.status(404).json({ error: "Song not found" });
+      return next(errorHandler(res, 404, "Song not found"));
     }
 
     res.status(200).json({
@@ -98,8 +102,18 @@ export const updateSong = async (req, res, next) => {
 
 export const removeSong = async (req, res, next) => {
   const { id } = req.params;
+
   try {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return next(errorHandler(res, 400, "Invalid song ID"));
+    }
+
     const removedSong = await Song.findByIdAndDelete(id);
+
+    if (!removedSong) {
+      return next(errorHandler(res, 404, "Song not found"));
+    }
+
     res.status(200).json({
       success: true,
       data: removedSong,
@@ -110,10 +124,15 @@ export const removeSong = async (req, res, next) => {
   }
 };
 
-export const getGeneralStats = async (req, res) => {
+export const getGeneralStats = async (req, res, next) => {
   try {
     const allSongs = await Song.find();
 
+    if (!allSongs) {
+      return next(
+        errorHandler(res, 404, "No songs Fetched Please Try again later")
+      );
+    }
     const uniqueArtists = [...new Set(allSongs.map((song) => song.artist))];
     const uniqueAlbums = [...new Set(allSongs.map((song) => song.album))];
     const uniqueGenres = [...new Set(allSongs.map((song) => song.genre))];
@@ -154,9 +173,65 @@ export const getGeneralStats = async (req, res) => {
       songsInAlbums,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: "Internal Server Error",
+    next(error);
+  }
+};
+export const searchSongs = async (req, res, next) => {
+  const { query } = req.params;
+
+  try {
+    if (!query) {
+      return next(errorHandler(res, 400, "Please provide a search query"));
+    }
+
+    const searchResults = await Song.find({
+      $or: [
+        { title: { $regex: query, $options: "i" } },
+        { artist: { $regex: query, $options: "i" } },
+        { album: { $regex: query, $options: "i" } },
+      ],
     });
+
+    if (searchResults.length === 0) {
+      return next(
+        errorHandler(res, 404, "No songs found matching the search query")
+      );
+    }
+
+    res.status(200).json({
+      success: true,
+      data: searchResults,
+    });
+  } catch (error) {
+    console.error("Error in searchSongs:", error);
+    next(error);
+  }
+};
+
+export const filterSongsByGenre = async (req, res, next) => {
+  const { genre } = req.params;
+
+  try {
+    if (!genre) {
+      return next(
+        errorHandler(res, 404, "Please provide a genre for filtering")
+      );
+    }
+
+    const filteredSongs = await Song.find({ genre });
+
+    if (filteredSongs.length === 0) {
+      return next(
+        errorHandler(res, 404, `No Songs Found for the genre: ${genre}`)
+      );
+    }
+
+    res.status(200).json({
+      success: true,
+      data: filteredSongs,
+    });
+  } catch (error) {
+    console.error("Error in filterSongsByGenre:", error);
+    next(error);
   }
 };
