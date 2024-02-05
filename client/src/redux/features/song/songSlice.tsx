@@ -25,7 +25,7 @@ const songSlice = createSlice({
     addSong: (state, action: PayloadAction<Song>) => {
       state.songs.push(action.payload);
     },
-    deleteSong: (state, action: PayloadAction<number>) => {
+    deleteSong: (state, action: PayloadAction<string>) => {
       state.songs = state.songs.filter((song) => song.id !== action.payload);
     },
     updateSong: (

@@ -77,7 +77,7 @@ interface StatisticsProps {
 
 const Statistics = () => {
   const dispatch = useDispatch();
-  const statistics = useSelector(selectStatistics);
+  const statistics = useSelector(selectStatistics) as StatisticsProps;
 
   useEffect(() => {
     const fetchData = async () => {

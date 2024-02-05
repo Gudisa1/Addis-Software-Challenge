@@ -40,10 +40,10 @@ interface Song {
 
 const SongList: React.FC = () => {
   const dispatch = useDispatch();
-  const songs: Song[] = useSelector(selectSongs);
+  const songs = useSelector(selectSongs);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
-  const [genres, setGenres] = useState<string | null>(null);
+  const [genres, setGenres] = useState<string[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   useEffect(() => {
@@ -51,15 +51,15 @@ const SongList: React.FC = () => {
       try {
         const [songs, genre] = await Promise.all([fetchData(), fetchGenres()]);
         const genredata = genre.data;
-        setGenres(genredata);
-        dispatch(setSongs(songs));
+        setGenres(genredata as string[]); // Assuming genredata is an array of strings
+        dispatch(setSongs(songs as any));
       } catch (error) {
         console.log("Error fetching songs:", error);
       }
     };
 
     fetchSongs();
-  }, [dispatch, searchTerm, songs]);
+  }, [dispatch, searchTerm]);
 
   const handleDelete = async (songId: string) => {
     try {
@@ -83,7 +83,7 @@ const SongList: React.FC = () => {
       console.log(searchedSongs);
       dispatch(setSongs(searchedSongs));
       setError(null);
-    } catch (error) {
+    } catch (error: any) {
       setError(error.response.data.error);
       setTimeout(() => {
         setError(null);

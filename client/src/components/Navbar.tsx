@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FiMenu, FiX, FiBell } from "react-icons/fi";
-import { Disclosure, Transition } from "@headlessui/react";
 import styled from "@emotion/styled";
 import { space } from "styled-system";
 
@@ -57,7 +56,7 @@ const Navbar = () => {
     <Header>
       <Nav>
         <NavLinkContainer>
-          <NavLinkList px={5}>
+          <NavLinkList>
             {navigation.map((item) => (
               <NavLink
                 key={item.name}
